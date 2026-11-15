@@ -1,7 +1,7 @@
 // Panneau des réglages moteur et projet : relie les champs du HTML aux données du projet.
 
 import { isValidFiringOrder } from '../dsp/engineSynth.ts';
-import { getDefaultFiringOrder, getVehicleProfile, VEHICLE_PROFILES } from '../dsp/vehicleProfiles.ts';
+import { getDefaultFiringOrder, getVehicleProfile, VEHICLE_CATEGORY_LABELS, VEHICLE_PROFILES, type VehicleCategory } from '../dsp/vehicleProfiles.ts';
 import type { Project, VehicleProfileId } from '../model/project.ts';
 
 export interface SettingsPanelCallbacks {
@@ -60,15 +60,25 @@ export class SettingsPanel {
   constructor(getProject: () => Project, callbacks: SettingsPanelCallbacks) {
     this.getProject = getProject;
     this.callbacks = callbacks;
-    for (const profile of Object.values(VEHICLE_PROFILES)) {
-      this.profileSelect.add(new Option(profile.label, profile.id));
-    }
+    this.fillProfileSelect();
     this.profileSelect.addEventListener('change', () => this.applyProfile());
     this.cylinderCountInput.addEventListener('change', () => this.applyCylinderCount());
     this.firingOrderInput.addEventListener('input', () => this.applyFiringOrder());
     this.masterGainInput.addEventListener('input', () => this.applyMasterGain());
     this.durationInput.addEventListener('change', () => this.applyDuration());
     this.refreshFromProject();
+  }
+
+  /** Remplit la liste des profils, groupés par catégorie (motos, voitures, camions et engins). */
+  private fillProfileSelect(): void {
+    for (const [category, categoryLabel] of Object.entries(VEHICLE_CATEGORY_LABELS)) {
+      const optionGroup = document.createElement('optgroup');
+      optionGroup.label = categoryLabel;
+      for (const profile of Object.values(VEHICLE_PROFILES)) {
+        if (profile.category === (category as VehicleCategory)) optionGroup.append(new Option(profile.label, profile.id));
+      }
+      this.profileSelect.append(optionGroup);
+    }
   }
 
   /** Recopie les valeurs du projet dans les champs (après chargement d'un fichier, par exemple). */
@@ -82,10 +92,17 @@ export class SettingsPanel {
     this.durationInput.value = String(project.durationSeconds);
   }
 
-  /** Nouveau profil : reprend son nombre de cylindres et son ordre d'allumage par défaut. */
+  /**
+   * Nouveau profil : reprend son nombre de cylindres et son ordre d'allumage par défaut,
+   * et remet la courbe de régime à l'échelle (une courbe de moto à 9000 tr/min devient une courbe de camion à 2500).
+   */
   private applyProfile(): void {
-    const engine = this.getProject().engine;
+    const project = this.getProject();
+    const engine = project.engine;
+    const previousProfile = getVehicleProfile(engine.profileId);
     const profile = getVehicleProfile(this.profileSelect.value as VehicleProfileId);
+    const rpmScale = profile.maxRpm / previousProfile.maxRpm;
+    for (const rpmPoint of project.curves.rpm.points) rpmPoint.value = Math.round(rpmPoint.value * rpmScale);
     engine.profileId = profile.id;
     engine.cylinderCount = profile.defaultCylinderCount;
     engine.firingOrder = getDefaultFiringOrder(profile, profile.defaultCylinderCount);

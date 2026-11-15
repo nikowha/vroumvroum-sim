@@ -2,7 +2,19 @@
 
 import type { AutomationCurve } from './automationCurve.ts';
 
-export type VehicleProfileId = 'motorcycle' | 'car' | 'truck';
+export type VehicleProfileId =
+  | 'motorcycleSingle'
+  | 'motorcycle'
+  | 'motorcycleTriple'
+  | 'motorcycleInline4'
+  | 'carInline3'
+  | 'car'
+  | 'carBoxer4'
+  | 'carV6'
+  | 'carV8'
+  | 'truck'
+  | 'truckV8'
+  | 'tractor';
 
 export interface EngineSettings {
   profileId: VehicleProfileId;

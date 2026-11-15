@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "check-render": "node scripts/checkRender.ts",
+    "check-levels": "node scripts/checkLevels.ts",
     "make-icons": "node scripts/makeIcons.mjs"
   },
   "devDependencies": {

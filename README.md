@@ -6,7 +6,7 @@ Webapp de sound design de bruit moteur (moto, voiture, camion) : on dessine le r
 (sur Safari, faire un rechargement forcé si l'ancienne version reste affichée)
 
 ## Utilisation
-- **Profil** : moto (bicylindre en V), voiture (4 cylindres), camion (6 cylindres diesel). On peut changer le nombre de cylindres et l'ordre d'allumage (ex. `1-3-4-2`).
+- **Profil** (12) : motos (monocylindre, bicylindre en V, 3 et 4 cylindres), voitures (3 et 4 cylindres, boxer, V6, V8), camions et engins (6 cylindres, V8 diesel, tracteur). On peut changer le nombre de cylindres et l'ordre d'allumage (ex. `1-3-4-2`). Changer de profil remet la courbe de régime à l'échelle du nouveau moteur.
 - **Timeline** :
   - piste *Régime* (tr/min) : 0 = moteur coupé ; quand le régime monte, le moteur est « en charge », quand il descend, c'est le frein moteur ;
   - piste *Distance au micro* (m) : donne l'effet Doppler, la baisse de volume et la perte d'aigus avec la distance.

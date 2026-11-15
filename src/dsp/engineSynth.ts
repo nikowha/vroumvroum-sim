@@ -19,9 +19,9 @@ const INTAKE_CUTOFF_HZ = 900;
 /** Écart de volume maximal entre cylindres (irrégularités réalistes). */
 const CYLINDER_GAIN_SPREAD = 0.15;
 const GOLDEN_RATIO_FRACTION = 0.618034;
-/** Gain appliqué avant la saturation douce finale. */
-const OUTPUT_DRIVE = 2.2;
 const MECHANICAL_HARMONIC_GAIN = 0.5;
+/** Limiteur de régime : au-delà de ce multiple du régime max du profil, le régime n'augmente plus. */
+const OVER_REV_LIMIT = 1.25;
 
 export class EngineSynth {
   private readonly sampleRate: number;
@@ -37,8 +37,10 @@ export class EngineSynth {
   private exhaustResonators: BandpassFilter[] = [];
   private exhaustResonatorGains: number[] = [];
   private readonly intakeFilter: OnePoleLowpass;
+  private readonly pulseBrightnessFilter: OnePoleLowpass;
   private readonly dcBlocker = new DcBlocker();
   private readonly noiseGenerator = new NoiseGenerator(NOISE_SEED);
+  private blockPeakBeforeSaturation = 0;
 
   /**
    * @param sampleRate fréquence d'échantillonnage (Hz)
@@ -47,6 +49,7 @@ export class EngineSynth {
     this.sampleRate = sampleRate;
     this.exhaustPipe = new DampedCombFilter(sampleRate, 1, 0, SPEED_OF_SOUND_METERS_PER_SECOND);
     this.intakeFilter = new OnePoleLowpass(sampleRate, INTAKE_CUTOFF_HZ);
+    this.pulseBrightnessFilter = new OnePoleLowpass(sampleRate, this.profile.pulseBrightnessHz);
   }
 
   /**
@@ -60,9 +63,13 @@ export class EngineSynth {
     this.masterGain = settings.masterGain;
     this.firingSlots = buildFiringSlots(profile, cylinderCount, settings.firingOrder);
     this.cylinderEnvelopes = new Float32Array(cylinderCount);
+    const gainPattern =
+      profile.cylinderGainPattern && profile.cylinderGainPattern.length === cylinderCount ? profile.cylinderGainPattern : null;
     this.cylinderGains = Float32Array.from({ length: cylinderCount }, (_unused, cylinderIndex) => {
-      return 1 - CYLINDER_GAIN_SPREAD * ((cylinderIndex * GOLDEN_RATIO_FRACTION) % 1);
+      const irregularity = 1 - CYLINDER_GAIN_SPREAD * ((cylinderIndex * GOLDEN_RATIO_FRACTION) % 1);
+      return irregularity * (gainPattern ? gainPattern[cylinderIndex] : 1);
     });
+    this.pulseBrightnessFilter.setCutoff(profile.pulseBrightnessHz);
     this.pulseDecayFactor = Math.exp(-1 / (profile.pulseDecaySeconds * this.sampleRate));
     this.exhaustPipe = new DampedCombFilter(
       this.sampleRate,
@@ -84,6 +91,7 @@ export class EngineSynth {
     this.exhaustPipe.reset();
     for (const resonator of this.exhaustResonators) resonator.reset();
     this.intakeFilter.reset();
+    this.pulseBrightnessFilter.reset();
     this.dcBlocker.reset();
     this.noiseGenerator.reset();
   }
@@ -99,9 +107,11 @@ export class EngineSynth {
   renderBlock(output: Float32Array, startRpm: number, endRpm: number, startLoad: number, endLoad: number): void {
     const frameCount = output.length;
     const profile = this.profile;
+    let blockPeak = 0;
+    const rpmLimit = profile.maxRpm * OVER_REV_LIMIT;
     for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
       const blockProgress = frameIndex / frameCount;
-      const rpm = startRpm + (endRpm - startRpm) * blockProgress;
+      const rpm = Math.min(startRpm + (endRpm - startRpm) * blockProgress, rpmLimit);
       const load = startLoad + (endLoad - startLoad) * blockProgress;
 
       this.advanceCycleAndFire(rpm, load);
@@ -109,14 +119,24 @@ export class EngineSynth {
       const noiseSample = this.noiseGenerator.nextSample();
 
       const combustionSample = pulseSum * (1 + profile.combustionNoiseAmount * (0.5 + load) * noiseSample);
-      const exhaustSample = this.processExhaust(combustionSample);
+      const exhaustSample = this.processExhaust(this.pulseBrightnessFilter.process(combustionSample));
       const intakeSample =
         this.intakeFilter.process(noiseSample) * (0.2 + pulseSum) * profile.intakeNoiseAmount * (0.3 + load);
       const mechanicalSample = this.computeMechanicalVibration(rpm);
 
-      const mixedSample = this.dcBlocker.process(exhaustSample + intakeSample + mechanicalSample);
-      output[frameIndex] = Math.tanh(mixedSample * OUTPUT_DRIVE) * this.masterGain;
+      const drivenSample = this.dcBlocker.process(exhaustSample + intakeSample + mechanicalSample) * profile.outputGain;
+      blockPeak = Math.max(blockPeak, Math.abs(drivenSample));
+      output[frameIndex] = Math.tanh(drivenSample) * this.masterGain;
     }
+    this.blockPeakBeforeSaturation = blockPeak;
+  }
+
+  /**
+   * Niveau crête du dernier bloc avant la saturation douce finale (limiteur de sécurité : au-dessus de ~0,8, elle s'entend).
+   * @returns crête avant saturation
+   */
+  getBlockPeakBeforeSaturation(): number {
+    return this.blockPeakBeforeSaturation;
   }
 
   /**
