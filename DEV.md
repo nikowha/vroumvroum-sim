@@ -51,6 +51,14 @@ src/
 - Version Windows : PWA installable dès maintenant (Edge/Chrome → Installer) ; Tauri 2 plus tard.
 - Orientation : paysage d'abord (panneau à gauche) ; en portrait étroit, le panneau passe au-dessus.
 
+## Proposition réalisme (2026-11-15, en attente d'accord)
+Diagnostic dans RESEARCH.md (« Pourquoi le son fait synthétique »). Étapes, chacune écoutable seule :
+1. **Irrégularités** : fluctuation lente du vilebrequin + variation de force d'une explosion à l'autre (réglage « Irrégularité »). Petit changement, gros effet attendu.
+2. **Forme d'impulsion** : impulsion douce (piston + combustion, comme enginesound) au lieu du clic exponentiel.
+3. **Échappement en guides d'onde** : collecteur commun + tuyau + silencieux à plusieurs éléments (modèle Baldan / enginesound) à la place du peigne + 3 formants. Gros chantier, recalibrer les 12 profils.
+4. **Environnement** : réflexion du sol (retard selon distance et hauteur du micro → effet de « phasing » au passage) + petite réverbération extérieure.
+5. **Bruits du véhicule** : roulement des pneus et vent selon la vitesse (dérivée de la courbe de distance).
+
 ## À faire (suite V0, ordre proposé)
 1. Écoute et réglage du son par profil (à l'oreille, avec l'utilisateur).
 2. Test iPad / iPhone (Safari) : déblocage audio, bouton silencieux, export / téléchargement.
