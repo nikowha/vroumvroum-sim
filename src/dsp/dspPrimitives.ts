@@ -48,7 +48,20 @@ export class BandpassFilter {
    * @param quality facteur de qualité Q
    */
   constructor(sampleRate: number, frequencyHz: number, quality: number) {
-    const angularFrequency = (2 * Math.PI * Math.min(frequencyHz, sampleRate * 0.45)) / sampleRate;
+    this.sampleRate = sampleRate;
+    this.setFrequency(frequencyHz, quality);
+  }
+
+  private readonly sampleRate: number;
+
+  /**
+   * Change la fréquence centrale et le Q sans vider la mémoire (filtre qui suit une vitesse, par exemple).
+   * @param frequencyHz fréquence centrale (Hz)
+   * @param quality facteur de qualité Q
+   */
+  setFrequency(frequencyHz: number, quality: number): void {
+    const sampleRate = this.sampleRate;
+    const angularFrequency = (2 * Math.PI * Math.min(Math.max(frequencyHz, 1), sampleRate * 0.45)) / sampleRate;
     const alpha = Math.sin(angularFrequency) / (2 * quality);
     const normalization = 1 + alpha;
     this.feedforward0 = alpha / normalization;

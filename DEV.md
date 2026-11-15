@@ -89,6 +89,7 @@ Motos : monocylindre, bicylindre en V, 3 cylindres, 4 cylindres sportive. Voitur
 
 ## Journal
 - 2026-11-15 : dossier, docs, recherche initiale, proposition V0 → accord (dépôt public sans code, paysage d'abord).
+- 2026-11-15 : retour « les pneus font du bruit de pluie » → cause : bruit blanc avec bande aiguë (42 % de l'énergie au-dessus de 2 kHz) ; refait en grondement grave/médium + ton de bande de roulement qui suit la vitesse + rythme des roues + texture de route, coupé au-dessus de 1,8 kHz (3 % au-dessus de 2 kHz). Niveau recalé.
 - 2026-11-15 : « son trop synthétique » → diagnostic (RESEARCH.md), puis les 5 étapes de réalisme faites, chacune avec case + curseur ; courbe Vitesse ajoutée ; niveaux recalibrés.
 - 2026-11-15 : retour utilisateur « bruit de fond derrière le son » → cause : plancher constant du souffle d'admission (audible même moteur coupé, -47 dB) + bruit de combustion continu à haut régime ; corrigé, réglage « Souffle » ajouté, gains recalibrés.
 - 2026-11-15 : retour utilisateur « camion sature vers 3000 tr/min » → cause : niveau avant limiteur à 1,2 et courbe de voiture non remise à l'échelle ; corrigé (gain par profil, brillance, limiteur de régime, remise à l'échelle). 9 profils ajoutés (12 au total).
