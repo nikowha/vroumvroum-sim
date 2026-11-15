@@ -1,6 +1,7 @@
 // Données du projet (réglages moteur + courbes). Sérialisable en JSON, sans DOM.
 
 import type { AutomationCurve } from './automationCurve.ts';
+import { completeEffectSettings, createDefaultEffectSettings, type EffectSettings } from './effects.ts';
 
 export type VehicleProfileId =
   | 'motorcycleSingle'
@@ -22,13 +23,13 @@ export interface EngineSettings {
   /** Ordre d'allumage, numéros de cylindres à partir de 1 (ex. [1, 3, 4, 2]). */
   firingOrder: number[];
   masterGain: number;
-  /** Multiplicateur du souffle (bruit de combustion + admission) : 0 = aucun, 1 = profil, 2 = double. */
-  noiseAmount: number;
 }
 
 export interface ProjectCurves {
   rpm: AutomationCurve;
   distance: AutomationCurve;
+  /** Vitesse du véhicule (km/h) : bruit des pneus et du vent. */
+  speed: AutomationCurve;
 }
 
 export type CurveKey = keyof ProjectCurves;
@@ -37,6 +38,7 @@ export interface Project {
   formatVersion: 1;
   durationSeconds: number;
   engine: EngineSettings;
+  effects: EffectSettings;
   curves: ProjectCurves;
 }
 
@@ -50,7 +52,8 @@ export function createDefaultProject(): Project {
   return {
     formatVersion: PROJECT_FORMAT_VERSION,
     durationSeconds: 10,
-    engine: { profileId: 'car', cylinderCount: 4, firingOrder: [1, 3, 4, 2], masterGain: 0.8, noiseAmount: 1 },
+    engine: { profileId: 'car', cylinderCount: 4, firingOrder: [1, 3, 4, 2], masterGain: 0.8 },
+    effects: createDefaultEffectSettings(),
     curves: {
       rpm: {
         interpolation: 'smooth',
@@ -70,6 +73,15 @@ export function createDefaultProject(): Project {
           { time: 0, value: 120 },
           { time: 5.5, value: 6 },
           { time: 10, value: 160 },
+        ],
+      },
+      speed: {
+        interpolation: 'smooth',
+        points: [
+          { time: 0, value: 40 },
+          { time: 4, value: 90 },
+          { time: 7, value: 100 },
+          { time: 10, value: 60 },
         ],
       },
     },
@@ -92,9 +104,22 @@ export function parseProject(rawData: unknown): Project {
     formatVersion: PROJECT_FORMAT_VERSION,
     durationSeconds: Number(candidate.durationSeconds) > 0 ? Number(candidate.durationSeconds) : defaults.durationSeconds,
     engine: { ...defaults.engine, ...candidate.engine },
+    effects: completeEffectSettings(candidate.effects ?? migrateOldBreathSetting(candidate.engine)),
     curves: {
       rpm: candidate.curves.rpm ?? defaults.curves.rpm,
       distance: candidate.curves.distance ?? defaults.curves.distance,
+      speed: candidate.curves.speed ?? defaults.curves.speed,
     },
   };
+}
+
+/**
+ * Anciens fichiers : le souffle était réglé par engine.noiseAmount ; on le reprend dans les effets.
+ * @param oldEngine réglages moteur lus dans le fichier
+ * @returns réglages d'effets partiels, ou undefined
+ */
+function migrateOldBreathSetting(oldEngine: unknown): Partial<EffectSettings> | undefined {
+  const oldNoiseAmount = (oldEngine as { noiseAmount?: unknown }).noiseAmount;
+  if (typeof oldNoiseAmount !== 'number') return undefined;
+  return { breath: { isEnabled: true, amount: oldNoiseAmount } };
 }

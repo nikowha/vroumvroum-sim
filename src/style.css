@@ -185,3 +185,50 @@ input.is-invalid {
     border-bottom: 1px solid var(--panel-border);
   }
 }
+
+/* Lignes du panneau Mixage / réalisme : case, nom, valeur, puis curseur sur toute la largeur. */
+.effects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.effect-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 6px;
+}
+
+.effect-row input[type='checkbox'] {
+  width: 22px;
+  height: 22px;
+}
+
+.effect-row input[type='range'] {
+  grid-column: 1 / -1;
+  min-height: 32px;
+  width: 100%;
+}
+
+.effect-name {
+  color: var(--text);
+}
+
+.effect-value {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+
+.effect-row.is-disabled .effect-name,
+.effect-row.is-disabled input[type='range'] {
+  opacity: 0.4;
+}
+
+.hint {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}

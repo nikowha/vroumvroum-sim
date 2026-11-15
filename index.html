@@ -32,8 +32,11 @@
         <label>Profil <select id="profileSelect"></select></label>
         <label>Cylindres <input type="number" id="cylinderCountInput" min="1" max="16" step="1" /></label>
         <label>Ordre d'allumage <input type="text" id="firingOrderInput" placeholder="1-3-4-2" inputmode="numeric" /></label>
-        <label>Souffle (bruit) <input type="range" id="noiseAmountInput" min="0" max="2" step="0.05" /></label>
         <label>Volume <input type="range" id="masterGainInput" min="0" max="1" step="0.01" /></label>
+
+        <h2>Mixage / réalisme</h2>
+        <div id="effectsContainer" class="effects-list"></div>
+        <p class="hint">Case = activer / couper. Double-clic sur un nom = dose par défaut.</p>
 
         <h2>Projet</h2>
         <label>Durée (s) <input type="number" id="durationInput" min="1" max="600" step="1" /></label>
@@ -51,6 +54,7 @@
           <li>Espace : lecture / pause.</li>
           <li>Régime à 0 = moteur coupé. La charge suit l'accélération.</li>
           <li>Changer de profil remet la courbe de régime à l'échelle du nouveau moteur.</li>
+          <li>Vitesse : sert au bruit des pneus et du vent (la distance règle le Doppler).</li>
         </ul>
       </aside>
 

@@ -32,6 +32,16 @@ export interface VehicleProfile {
   pulseDecaySeconds: number;
   /** Fréquence de coupure appliquée aux impulsions (Hz) : plus bas = son plus rond, moins grésillant. */
   pulseBrightnessHz: number;
+  /** Durée de l'explosion « douce », en fraction du cycle de 720° (diesel plus court = plus claquant). */
+  pulseDurationCycleFraction: number;
+  /** Longueur des tuyaux de collecteur, un par cylindre (m). */
+  headerLengthMeters: number;
+  /** Hauteur de la sortie d'échappement au-dessus du sol (m) : règle la réflexion du sol. */
+  exhaustHeightMeters: number;
+  /** Volume relatif du bruit des pneus (2 roues, 4 roues, poids lourd). */
+  tireNoiseScale: number;
+  /** Gain de l'échappement à tuyaux, réglé pour un volume égal à l'échappement simple (npm run check-levels). */
+  pipeExhaustGain: number;
   combustionNoiseAmount: number;
   exhaustPipeLengthMeters: number;
   exhaustPipeFeedback: number;
@@ -56,6 +66,11 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     maxRpm: 9500,
     pulseDecaySeconds: 0.003,
     pulseBrightnessHz: 5000,
+    pulseDurationCycleFraction: 0.09,
+    headerLengthMeters: 0.6,
+    exhaustHeightMeters: 0.4,
+    tireNoiseScale: 0.45,
+    pipeExhaustGain: 2.37,
     combustionNoiseAmount: 0.3,
     exhaustPipeLengthMeters: 1.1,
     exhaustPipeFeedback: 0.45,
@@ -66,7 +81,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.12,
     mechanicalAmount: 0.05,
-    outputGain: 1.33,
+    outputGain: 0.68,
   },
   motorcycle: {
     id: 'motorcycle',
@@ -80,6 +95,11 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     maxRpm: 9000,
     pulseDecaySeconds: 0.004,
     pulseBrightnessHz: 4500,
+    pulseDurationCycleFraction: 0.09,
+    headerLengthMeters: 0.6,
+    exhaustHeightMeters: 0.4,
+    tireNoiseScale: 0.45,
+    pipeExhaustGain: 2.13,
     combustionNoiseAmount: 0.35,
     exhaustPipeLengthMeters: 0.9,
     exhaustPipeFeedback: 0.45,
@@ -90,7 +110,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.12,
     mechanicalAmount: 0.05,
-    outputGain: 1.46,
+    outputGain: 1.04,
   },
   motorcycleTriple: {
     id: 'motorcycleTriple',
@@ -104,6 +124,11 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     maxRpm: 12000,
     pulseDecaySeconds: 0.002,
     pulseBrightnessHz: 6000,
+    pulseDurationCycleFraction: 0.09,
+    headerLengthMeters: 0.6,
+    exhaustHeightMeters: 0.4,
+    tireNoiseScale: 0.45,
+    pipeExhaustGain: 3.71,
     combustionNoiseAmount: 0.25,
     exhaustPipeLengthMeters: 1.0,
     exhaustPipeFeedback: 0.45,
@@ -114,7 +139,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.14,
     mechanicalAmount: 0.04,
-    outputGain: 1.44,
+    outputGain: 0.83,
   },
   motorcycleInline4: {
     id: 'motorcycleInline4',
@@ -128,6 +153,11 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     maxRpm: 14000,
     pulseDecaySeconds: 0.0015,
     pulseBrightnessHz: 7000,
+    pulseDurationCycleFraction: 0.09,
+    headerLengthMeters: 0.6,
+    exhaustHeightMeters: 0.4,
+    tireNoiseScale: 0.45,
+    pipeExhaustGain: 6.52,
     combustionNoiseAmount: 0.2,
     exhaustPipeLengthMeters: 0.8,
     exhaustPipeFeedback: 0.4,
@@ -138,7 +168,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.16,
     mechanicalAmount: 0.03,
-    outputGain: 1.52,
+    outputGain: 0.51,
   },
   carInline3: {
     id: 'carInline3',
@@ -152,6 +182,11 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     maxRpm: 6500,
     pulseDecaySeconds: 0.003,
     pulseBrightnessHz: 3500,
+    pulseDurationCycleFraction: 0.09,
+    headerLengthMeters: 0.8,
+    exhaustHeightMeters: 0.3,
+    tireNoiseScale: 1,
+    pipeExhaustGain: 5.18,
     combustionNoiseAmount: 0.25,
     exhaustPipeLengthMeters: 2.0,
     exhaustPipeFeedback: 0.5,
@@ -162,7 +197,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.1,
     mechanicalAmount: 0.05,
-    outputGain: 1.35,
+    outputGain: 0.56,
   },
   car: {
     id: 'car',
@@ -176,6 +211,11 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     maxRpm: 7000,
     pulseDecaySeconds: 0.003,
     pulseBrightnessHz: 3500,
+    pulseDurationCycleFraction: 0.09,
+    headerLengthMeters: 0.8,
+    exhaustHeightMeters: 0.3,
+    tireNoiseScale: 1,
+    pipeExhaustGain: 3.42,
     combustionNoiseAmount: 0.25,
     exhaustPipeLengthMeters: 2.5,
     exhaustPipeFeedback: 0.5,
@@ -186,7 +226,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.1,
     mechanicalAmount: 0.04,
-    outputGain: 1.82,
+    outputGain: 0.98,
   },
   carBoxer4: {
     id: 'carBoxer4',
@@ -201,6 +241,11 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     maxRpm: 7000,
     pulseDecaySeconds: 0.0035,
     pulseBrightnessHz: 3000,
+    pulseDurationCycleFraction: 0.09,
+    headerLengthMeters: 0.8,
+    exhaustHeightMeters: 0.3,
+    tireNoiseScale: 1,
+    pipeExhaustGain: 3.46,
     combustionNoiseAmount: 0.25,
     exhaustPipeLengthMeters: 2.6,
     exhaustPipeFeedback: 0.5,
@@ -211,7 +256,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.1,
     mechanicalAmount: 0.04,
-    outputGain: 1.94,
+    outputGain: 0.98,
   },
   carV6: {
     id: 'carV6',
@@ -225,6 +270,11 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     maxRpm: 7000,
     pulseDecaySeconds: 0.0028,
     pulseBrightnessHz: 3500,
+    pulseDurationCycleFraction: 0.09,
+    headerLengthMeters: 0.8,
+    exhaustHeightMeters: 0.3,
+    tireNoiseScale: 1,
+    pipeExhaustGain: 4.83,
     combustionNoiseAmount: 0.22,
     exhaustPipeLengthMeters: 2.8,
     exhaustPipeFeedback: 0.5,
@@ -235,7 +285,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.12,
     mechanicalAmount: 0.04,
-    outputGain: 1.87,
+    outputGain: 0.79,
   },
   carV8: {
     id: 'carV8',
@@ -250,6 +300,11 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     maxRpm: 6500,
     pulseDecaySeconds: 0.003,
     pulseBrightnessHz: 2800,
+    pulseDurationCycleFraction: 0.09,
+    headerLengthMeters: 0.8,
+    exhaustHeightMeters: 0.3,
+    tireNoiseScale: 1,
+    pipeExhaustGain: 2.75,
     combustionNoiseAmount: 0.25,
     exhaustPipeLengthMeters: 3.0,
     exhaustPipeFeedback: 0.55,
@@ -260,7 +315,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.12,
     mechanicalAmount: 0.05,
-    outputGain: 1.55,
+    outputGain: 1.93,
   },
   truck: {
     id: 'truck',
@@ -274,6 +329,11 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     maxRpm: 2500,
     pulseDecaySeconds: 0.006,
     pulseBrightnessHz: 2200,
+    pulseDurationCycleFraction: 0.06,
+    headerLengthMeters: 1.1,
+    exhaustHeightMeters: 1,
+    tireNoiseScale: 1.8,
+    pipeExhaustGain: 4.46,
     combustionNoiseAmount: 0.4,
     exhaustPipeLengthMeters: 3.5,
     exhaustPipeFeedback: 0.5,
@@ -284,7 +344,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.18,
     mechanicalAmount: 0.08,
-    outputGain: 1.65,
+    outputGain: 1.06,
   },
   truckV8: {
     id: 'truckV8',
@@ -298,6 +358,11 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     maxRpm: 2200,
     pulseDecaySeconds: 0.007,
     pulseBrightnessHz: 2000,
+    pulseDurationCycleFraction: 0.06,
+    headerLengthMeters: 1.1,
+    exhaustHeightMeters: 1,
+    tireNoiseScale: 1.8,
+    pipeExhaustGain: 3.84,
     combustionNoiseAmount: 0.4,
     exhaustPipeLengthMeters: 3.8,
     exhaustPipeFeedback: 0.5,
@@ -308,7 +373,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.2,
     mechanicalAmount: 0.08,
-    outputGain: 1.14,
+    outputGain: 1.45,
   },
   tractor: {
     id: 'tractor',
@@ -322,6 +387,11 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     maxRpm: 2400,
     pulseDecaySeconds: 0.006,
     pulseBrightnessHz: 2500,
+    pulseDurationCycleFraction: 0.06,
+    headerLengthMeters: 1.1,
+    exhaustHeightMeters: 1,
+    tireNoiseScale: 1.8,
+    pipeExhaustGain: 2.16,
     combustionNoiseAmount: 0.5,
     exhaustPipeLengthMeters: 1.5,
     exhaustPipeFeedback: 0.45,
@@ -332,7 +402,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.15,
     mechanicalAmount: 0.1,
-    outputGain: 1.19,
+    outputGain: 1.16,
   },
 };
 

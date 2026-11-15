@@ -7,12 +7,14 @@ import { exportProjectToWav } from './audio/wavExporter.ts';
 import { getVehicleProfile } from './dsp/vehicleProfiles.ts';
 import { createDefaultProject, parseProject, type Project } from './model/project.ts';
 import { createFileTimestamp, downloadBlob, pickTextFile } from './ui/fileTransfer.ts';
+import { EffectsPanel } from './ui/effectsPanel.ts';
 import { getRequiredElement, SettingsPanel } from './ui/settingsPanel.ts';
 import { TimelineEditor, type LaneDefinition } from './ui/timelineEditor.ts';
 
 const RPM_LANE_HEADROOM = 1.15;
 const RPM_LANE_ROUNDING = 1000;
 const DISTANCE_LANE_MAX_METERS = 300;
+const SPEED_LANE_MAX_KMH = 250;
 
 const TIMELINE_LANES: LaneDefinition[] = [
   {
@@ -31,6 +33,14 @@ const TIMELINE_LANES: LaneDefinition[] = [
     minValue: 0,
     getMaxValue: () => DISTANCE_LANE_MAX_METERS,
     valueDecimals: 1,
+  },
+  {
+    curveKey: 'speed',
+    label: 'Vitesse (km/h)',
+    color: '#9ccc65',
+    minValue: 0,
+    getMaxValue: () => SPEED_LANE_MAX_KMH,
+    valueDecimals: 0,
   },
 ];
 
@@ -68,6 +78,10 @@ const settingsPanel = new SettingsPanel(() => currentProject, {
     setPlayheadTime(Math.min(playheadTimeSeconds, currentProject.durationSeconds));
   },
 });
+
+const effectsPanel = new EffectsPanel(getRequiredElement<HTMLDivElement>('effectsContainer'), () => currentProject, () =>
+  realtimePlayer.setProject(currentProject),
+);
 
 /**
  * Met à jour la tête de lecture (affichage seulement).
@@ -155,6 +169,7 @@ async function loadProject(): Promise<void> {
     currentProject = parseProject(JSON.parse(projectText));
     stopAndRewind();
     settingsPanel.refreshFromProject();
+    effectsPanel.refreshFromProject();
     realtimePlayer.setProject(currentProject);
     timelineEditor.requestRender();
   } catch (error) {

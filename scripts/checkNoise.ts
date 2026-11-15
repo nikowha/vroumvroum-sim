@@ -3,6 +3,7 @@
 
 import { RENDER_BLOCK_SIZE, SAMPLE_RATE } from '../src/config.ts';
 import { EngineSynth } from '../src/dsp/engineSynth.ts';
+import { createDefaultEffectSettings } from '../src/model/effects.ts';
 import { getDefaultFiringOrder, VEHICLE_PROFILES, type VehicleProfile } from '../src/dsp/vehicleProfiles.ts';
 
 const MEASURE_SECONDS = 1;
@@ -20,8 +21,7 @@ function measureSteadyRms(profile: VehicleProfile, rpm: number): number {
     cylinderCount: profile.defaultCylinderCount,
     firingOrder: getDefaultFiringOrder(profile, profile.defaultCylinderCount),
     masterGain: 1,
-    noiseAmount: 1,
-  });
+  }, createDefaultEffectSettings());
   const block = new Float32Array(RENDER_BLOCK_SIZE);
   let sumOfSquares = 0;
   let sampleCount = 0;

@@ -51,7 +51,6 @@ export class SettingsPanel {
   private readonly cylinderCountInput = getRequiredElement<HTMLInputElement>('cylinderCountInput');
   private readonly firingOrderInput = getRequiredElement<HTMLInputElement>('firingOrderInput');
   private readonly masterGainInput = getRequiredElement<HTMLInputElement>('masterGainInput');
-  private readonly noiseAmountInput = getRequiredElement<HTMLInputElement>('noiseAmountInput');
   private readonly durationInput = getRequiredElement<HTMLInputElement>('durationInput');
 
   /**
@@ -66,7 +65,6 @@ export class SettingsPanel {
     this.cylinderCountInput.addEventListener('change', () => this.applyCylinderCount());
     this.firingOrderInput.addEventListener('input', () => this.applyFiringOrder());
     this.masterGainInput.addEventListener('input', () => this.applyMasterGain());
-    this.noiseAmountInput.addEventListener('input', () => this.applyNoiseAmount());
     this.durationInput.addEventListener('change', () => this.applyDuration());
     this.refreshFromProject();
   }
@@ -91,7 +89,6 @@ export class SettingsPanel {
     this.firingOrderInput.value = formatFiringOrder(project.engine.firingOrder);
     this.firingOrderInput.classList.remove('is-invalid');
     this.masterGainInput.value = String(project.engine.masterGain);
-    this.noiseAmountInput.value = String(project.engine.noiseAmount);
     this.durationInput.value = String(project.durationSeconds);
   }
 
@@ -132,12 +129,6 @@ export class SettingsPanel {
     this.firingOrderInput.classList.toggle('is-invalid', !isValid);
     if (!isValid) return;
     engine.firingOrder = firingOrder;
-    this.callbacks.onEngineChanged();
-  }
-
-  /** Quantité de souffle (bruit de combustion et d'admission). */
-  private applyNoiseAmount(): void {
-    this.getProject().engine.noiseAmount = Number(this.noiseAmountInput.value);
     this.callbacks.onEngineChanged();
   }
 

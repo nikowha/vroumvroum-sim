@@ -25,10 +25,13 @@ src/
 ├── config.ts               constantes (48 kHz, blocs de 128, vitesse du son…)
 ├── model/                  données pures (JSON) : projet, courbes d'automation
 ├── dsp/                    DSP pur, sans Web Audio (→ futur Rust/WASM)
+│   ├── exhaustPipes.ts     guides d'onde : collecteur, tuyau droit, silencieux
+│   ├── outdoorReverb.ts    réverbération extérieure (FDN 4 lignes)
+│   ├── vehicleNoise.ts     pneus et vent selon la vitesse
 │   ├── dspPrimitives.ts    bruit déterministe, passe-bande, passe-bas, peigne amorti, anti-DC
 │   ├── vehicleProfiles.ts  profils moto / voiture / camion
 │   ├── engineSynth.ts      cycle 720°, impulsions par cylindre, échappement, admission, vibrations
-│   ├── dopplerLine.ts      retard variable + 1/distance + absorption de l'air
+│   ├── dopplerLine.ts      retard variable + 1/distance + absorption de l'air + réflexion du sol
 │   └── projectRenderer.ts  courbes → moteur → Doppler, bloc par bloc
 ├── audio/
 │   ├── engineWorkletProcessor.ts  AudioWorklet (aperçu)
@@ -51,13 +54,21 @@ src/
 - Version Windows : PWA installable dès maintenant (Edge/Chrome → Installer) ; Tauri 2 plus tard.
 - Orientation : paysage d'abord (panneau à gauche) ; en portrait étroit, le panneau passe au-dessus.
 
-## Proposition réalisme (2026-11-15, en attente d'accord)
+## Réalisme (2026-11-15, accordé et fait : les 5 étapes)
 Diagnostic dans RESEARCH.md (« Pourquoi le son fait synthétique »). Étapes, chacune écoutable seule :
 1. **Irrégularités** : fluctuation lente du vilebrequin + variation de force d'une explosion à l'autre (réglage « Irrégularité »). Petit changement, gros effet attendu.
 2. **Forme d'impulsion** : impulsion douce (piston + combustion, comme enginesound) au lieu du clic exponentiel.
 3. **Échappement en guides d'onde** : collecteur commun + tuyau + silencieux à plusieurs éléments (modèle Baldan / enginesound) à la place du peigne + 3 formants. Gros chantier, recalibrer les 12 profils.
 4. **Environnement** : réflexion du sol (retard selon distance et hauteur du micro → effet de « phasing » au passage) + petite réverbération extérieure.
-5. **Bruits du véhicule** : roulement des pneus et vent selon la vitesse (dérivée de la courbe de distance).
+5. **Bruits du véhicule** : roulement des pneus et vent selon la vitesse.
+
+Fait : chaque effet a une case (activer / couper) et un curseur de dose dans le panneau « Mixage / réalisme » (`project.effects`, `src/model/effects.ts`) :
+souffle, irrégularités, explosion douce, échappement à tuyaux (fondu avec l'ancien modèle simple), réflexion du sol, réverbération, pneus, vent.
+Nouvelle courbe **Vitesse (km/h)** pour pneus et vent (la distance reste indépendante : elle règle le Doppler).
+Calibrage (`npm run check-levels`) : crête ≤ 0,7 par profil tous effets actifs ; tuyaux ≈ simple à ±2 dB (`pipeExhaustGain` par profil) ;
+pneus ≈ -4 dB sous une voiture à 3500 tr/min à 100 km/h (5 m) ; vent ≈ -10 dB à 130 km/h ; réverbération = son direct vers 40 m.
+Ressemblance cycle à cycle : 1,000 → 0,97 (irrégularités à 100 %). Limiteur doux final (au-dessus de 0,8).
+Rendu ≈ 55–75× plus rapide que le temps réel (contre 200× avant) : large marge pour l'AudioWorklet.
 
 ## À faire (suite V0, ordre proposé)
 1. Écoute et réglage du son par profil (à l'oreille, avec l'utilisateur).
@@ -78,6 +89,7 @@ Motos : monocylindre, bicylindre en V, 3 cylindres, 4 cylindres sportive. Voitur
 
 ## Journal
 - 2026-11-15 : dossier, docs, recherche initiale, proposition V0 → accord (dépôt public sans code, paysage d'abord).
+- 2026-11-15 : « son trop synthétique » → diagnostic (RESEARCH.md), puis les 5 étapes de réalisme faites, chacune avec case + curseur ; courbe Vitesse ajoutée ; niveaux recalibrés.
 - 2026-11-15 : retour utilisateur « bruit de fond derrière le son » → cause : plancher constant du souffle d'admission (audible même moteur coupé, -47 dB) + bruit de combustion continu à haut régime ; corrigé, réglage « Souffle » ajouté, gains recalibrés.
 - 2026-11-15 : retour utilisateur « camion sature vers 3000 tr/min » → cause : niveau avant limiteur à 1,2 et courbe de voiture non remise à l'échelle ; corrigé (gain par profil, brillance, limiteur de régime, remise à l'échelle). 9 profils ajoutés (12 au total).
 - 2026-11-15 : V0 codée (DSP, AudioWorklet, export Worker, timeline RPM + distance, sauvegarde JSON, PWA), testée dans le navigateur intégré, publiée sur GitHub Pages.

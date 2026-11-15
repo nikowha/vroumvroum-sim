@@ -7,9 +7,12 @@ Webapp de sound design de bruit moteur (moto, voiture, camion) : on dessine le r
 
 ## Utilisation
 - **Profil** (12) : motos (monocylindre, bicylindre en V, 3 et 4 cylindres), voitures (3 et 4 cylindres, boxer, V6, V8), camions et engins (6 cylindres, V8 diesel, tracteur). On peut changer le nombre de cylindres, l'ordre d'allumage (ex. `1-3-4-2`) et la quantité de **souffle** (bruit de combustion et d'admission, 0 à 2). Changer de profil remet la courbe de régime à l'échelle du nouveau moteur.
+- **Mixage / réalisme** : chaque effet a une case pour l'activer ou le couper et un curseur de dose (double-clic sur le nom = dose par défaut) :
+  souffle, irrégularités (moteur moins « parfait »), explosion douce, échappement à tuyaux (0 = ancien modèle simple), réflexion du sol, réverbération extérieure, pneus, vent.
 - **Timeline** :
   - piste *Régime* (tr/min) : 0 = moteur coupé ; quand le régime monte, le moteur est « en charge », quand il descend, c'est le frein moteur ;
-  - piste *Distance au micro* (m) : donne l'effet Doppler, la baisse de volume et la perte d'aigus avec la distance.
+  - piste *Distance au micro* (m) : donne l'effet Doppler, la baisse de volume, la perte d'aigus et le rebond sur le sol ;
+  - piste *Vitesse* (km/h) : bruit des pneus et du vent.
 - Clic / tap dans une piste : ajouter un point, puis glisser. Double-clic (souris) ou appui long (doigt / Pencil) sur un point : le supprimer.
 - Règle du haut : déplacer la tête de lecture. Barre d'espace : lecture / pause.
 - **Exporter WAV** : 48 kHz, 24 bits ou 32 bits float, mono, normalisation à -1 dBFS en option. L'export est identique à ce qu'on entend.
