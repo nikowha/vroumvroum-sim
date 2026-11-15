@@ -7,6 +7,9 @@ import { PROJECT_FORMAT_VERSION, type Project } from './project.ts';
 
 export type TestProjectId = 'passBy' | 'closeEngine';
 
+/** Noms affichés des tests. */
+export const TEST_PROJECT_LABELS: Record<TestProjectId, string> = { passBy: 'Passage', closeEngine: 'Moteur proche' };
+
 /** Point de régime : instant (s) et fraction de la plage ralenti (0) → régime max (1). */
 interface RpmFractionPoint {
   time: number;

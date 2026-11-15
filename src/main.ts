@@ -6,7 +6,7 @@ import type { WavSampleFormat } from './audio/wavEncoder.ts';
 import { exportProjectToWav } from './audio/wavExporter.ts';
 import { getVehicleProfile } from './dsp/vehicleProfiles.ts';
 import { createDefaultProject, parseProject, type Project } from './model/project.ts';
-import { createTestProject, type TestProjectId } from './model/testProjects.ts';
+import { createTestProject, TEST_PROJECT_LABELS, type TestProjectId } from './model/testProjects.ts';
 import { createFileTimestamp, downloadBlob, pickTextFile } from './ui/fileTransfer.ts';
 import { EffectsPanel } from './ui/effectsPanel.ts';
 import { getRequiredElement, SettingsPanel } from './ui/settingsPanel.ts';
@@ -56,6 +56,9 @@ const exportStatus = getRequiredElement<HTMLSpanElement>('exportStatus');
 const exportFormatSelect = getRequiredElement<HTMLSelectElement>('exportFormatSelect');
 const normalizeCheckbox = getRequiredElement<HTMLInputElement>('normalizeCheckbox');
 const projectFileInput = getRequiredElement<HTMLInputElement>('projectFileInput');
+const switchTestButton = getRequiredElement<HTMLButtonElement>('switchTestButton');
+/** Test affiché : le projet de démarrage est un passage. */
+let currentTestProjectId: TestProjectId = 'passBy';
 
 const realtimePlayer = new RealtimePlayer({
   onPlayheadChanged: (timeSeconds) => {
@@ -177,12 +180,14 @@ function replaceProject(newProject: Project): void {
 }
 
 /**
- * Charge un projet de test (même moteur, même mixage) et lance la lecture depuis le début.
- * @param testProjectId test voulu
+ * Passe à l'autre test (Passage ↔ Moteur proche) : même moteur, même mixage, lecture lancée depuis le début.
+ * Le projet de démarrage étant un passage, le premier clic donne « Moteur proche ».
  */
-function loadTestProject(testProjectId: TestProjectId): void {
+function switchTestProject(): void {
+  currentTestProjectId = currentTestProjectId === 'passBy' ? 'closeEngine' : 'passBy';
   const profile = getVehicleProfile(currentProject.engine.profileId);
-  replaceProject(createTestProject(testProjectId, currentProject, profile.idleRpm, profile.maxRpm));
+  replaceProject(createTestProject(currentTestProjectId, currentProject, profile.idleRpm, profile.maxRpm));
+  switchTestButton.textContent = `⇄ Test : ${TEST_PROJECT_LABELS[currentTestProjectId]}`;
   void togglePlayback();
 }
 
@@ -202,8 +207,7 @@ getRequiredElement<HTMLButtonElement>('stopButton').addEventListener('click', st
 exportButton.addEventListener('click', () => void exportWav());
 getRequiredElement<HTMLButtonElement>('saveProjectButton').addEventListener('click', saveProject);
 getRequiredElement<HTMLButtonElement>('loadProjectButton').addEventListener('click', () => void loadProject());
-getRequiredElement<HTMLButtonElement>('passByTestButton').addEventListener('click', () => loadTestProject('passBy'));
-getRequiredElement<HTMLButtonElement>('closeEngineTestButton').addEventListener('click', () => loadTestProject('closeEngine'));
+switchTestButton.addEventListener('click', switchTestProject);
 window.addEventListener('keydown', (keyboardEvent) => {
   const isTyping = keyboardEvent.target instanceof HTMLInputElement || keyboardEvent.target instanceof HTMLSelectElement;
   if (keyboardEvent.code === 'Space' && !isTyping) {

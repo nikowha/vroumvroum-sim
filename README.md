@@ -6,7 +6,7 @@ Webapp de sound design de bruit moteur (moto, voiture, camion) : on dessine le r
 (sur Safari, faire un rechargement forcé si l'ancienne version reste affichée)
 
 ## Utilisation
-- **Tests d'écoute** (en haut du panneau) : *Passage* = le véhicule arrive, passe devant le micro et repart (Doppler, distance, pneus, vent) ; *Moteur proche* = moteur à l'arrêt à 5 m du micro, ralenti, coups d'accélérateur puis montée au régime max, sans effet de distance. Les deux gardent le profil et le mixage en cours, remplacent les courbes et lancent la lecture.
+- **Test d'écoute** (bouton en haut du panneau) : chaque clic passe d'un test à l'autre et lance la lecture. *Passage* = le véhicule arrive, passe devant le micro et repart (Doppler, distance, pneus, vent) ; *Moteur proche* = moteur à l'arrêt à 5 m du micro, ralenti, coups d'accélérateur puis montée au régime max, sans effet de distance. Garde le profil et le mixage, remplace les courbes.
 - **Profil** (12) : motos (monocylindre, bicylindre en V, 3 et 4 cylindres), voitures (3 et 4 cylindres, boxer, V6, V8), camions et engins (6 cylindres, V8 diesel, tracteur). On peut changer le nombre de cylindres, l'ordre d'allumage (ex. `1-3-4-2`) et la quantité de **souffle** (bruit de combustion et d'admission, 0 à 2). Changer de profil remet la courbe de régime à l'échelle du nouveau moteur.
 - **Mixage / réalisme** : chaque effet a une case pour l'activer ou le couper et un curseur de dose (double-clic sur le nom = dose par défaut) :
   souffle, irrégularités (moteur moins « parfait »), explosion douce, échappement à tuyaux (0 = ancien modèle simple), réflexion du sol, réverbération extérieure, pneus, vent.
