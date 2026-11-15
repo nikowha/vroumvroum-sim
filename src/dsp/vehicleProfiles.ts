@@ -66,7 +66,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.12,
     mechanicalAmount: 0.05,
-    outputGain: 1.2,
+    outputGain: 1.33,
   },
   motorcycle: {
     id: 'motorcycle',
@@ -90,7 +90,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.12,
     mechanicalAmount: 0.05,
-    outputGain: 1.3,
+    outputGain: 1.46,
   },
   motorcycleTriple: {
     id: 'motorcycleTriple',
@@ -114,7 +114,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.14,
     mechanicalAmount: 0.04,
-    outputGain: 1.25,
+    outputGain: 1.44,
   },
   motorcycleInline4: {
     id: 'motorcycleInline4',
@@ -138,7 +138,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.16,
     mechanicalAmount: 0.03,
-    outputGain: 1.35,
+    outputGain: 1.52,
   },
   carInline3: {
     id: 'carInline3',
@@ -162,7 +162,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.1,
     mechanicalAmount: 0.05,
-    outputGain: 1.25,
+    outputGain: 1.35,
   },
   car: {
     id: 'car',
@@ -186,7 +186,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.1,
     mechanicalAmount: 0.04,
-    outputGain: 1.6,
+    outputGain: 1.82,
   },
   carBoxer4: {
     id: 'carBoxer4',
@@ -211,7 +211,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.1,
     mechanicalAmount: 0.04,
-    outputGain: 1.7,
+    outputGain: 1.94,
   },
   carV6: {
     id: 'carV6',
@@ -235,7 +235,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.12,
     mechanicalAmount: 0.04,
-    outputGain: 1.65,
+    outputGain: 1.87,
   },
   carV8: {
     id: 'carV8',
@@ -260,7 +260,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.12,
     mechanicalAmount: 0.05,
-    outputGain: 1.4,
+    outputGain: 1.55,
   },
   truck: {
     id: 'truck',
@@ -284,7 +284,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.18,
     mechanicalAmount: 0.08,
-    outputGain: 1.4,
+    outputGain: 1.65,
   },
   truckV8: {
     id: 'truckV8',
@@ -308,7 +308,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.2,
     mechanicalAmount: 0.08,
-    outputGain: 1,
+    outputGain: 1.14,
   },
   tractor: {
     id: 'tractor',
@@ -332,7 +332,7 @@ export const VEHICLE_PROFILES: Record<VehicleProfileId, VehicleProfile> = {
     ],
     intakeNoiseAmount: 0.15,
     mechanicalAmount: 0.1,
-    outputGain: 1.05,
+    outputGain: 1.19,
   },
 };
 

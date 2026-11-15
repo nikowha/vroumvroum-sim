@@ -24,6 +24,7 @@ for (const profile of Object.values(VEHICLE_PROFILES)) {
         cylinderCount: profile.defaultCylinderCount,
         firingOrder: getDefaultFiringOrder(profile, profile.defaultCylinderCount),
         masterGain: 1,
+    noiseAmount: 1,
       });
       const block = new Float32Array(RENDER_BLOCK_SIZE);
       let peakBeforeSaturation = 0;

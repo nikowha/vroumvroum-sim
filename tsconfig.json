@@ -14,5 +14,5 @@
     "noUnusedParameters": true,
     "skipLibCheck": true
   },
-  "include": ["src", "scripts/checkRender.ts", "scripts/checkLevels.ts"]
+  "include": ["src", "scripts/checkRender.ts", "scripts/checkLevels.ts", "scripts/checkNoise.ts"]
 }

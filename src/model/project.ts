@@ -22,6 +22,8 @@ export interface EngineSettings {
   /** Ordre d'allumage, numéros de cylindres à partir de 1 (ex. [1, 3, 4, 2]). */
   firingOrder: number[];
   masterGain: number;
+  /** Multiplicateur du souffle (bruit de combustion + admission) : 0 = aucun, 1 = profil, 2 = double. */
+  noiseAmount: number;
 }
 
 export interface ProjectCurves {
@@ -48,7 +50,7 @@ export function createDefaultProject(): Project {
   return {
     formatVersion: PROJECT_FORMAT_VERSION,
     durationSeconds: 10,
-    engine: { profileId: 'car', cylinderCount: 4, firingOrder: [1, 3, 4, 2], masterGain: 0.8 },
+    engine: { profileId: 'car', cylinderCount: 4, firingOrder: [1, 3, 4, 2], masterGain: 0.8, noiseAmount: 1 },
     curves: {
       rpm: {
         interpolation: 'smooth',

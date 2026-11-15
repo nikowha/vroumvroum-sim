@@ -16,6 +16,9 @@ const DEGREES_PER_ENGINE_CYCLE = 720;
 /** En dessous de ce régime, le moteur est considéré comme arrêté (pas d'allumage). */
 const ENGINE_STOPPED_RPM = 120;
 const INTAKE_CUTOFF_HZ = 900;
+/** Lissage du débit d'air de l'admission (Hz) : suit le rythme des allumages, s'éteint moteur coupé. */
+const AIRFLOW_SMOOTHING_HZ = 25;
+const AIRFLOW_GAIN = 0.6;
 /** Écart de volume maximal entre cylindres (irrégularités réalistes). */
 const CYLINDER_GAIN_SPREAD = 0.15;
 const GOLDEN_RATIO_FRACTION = 0.618034;
@@ -37,7 +40,10 @@ export class EngineSynth {
   private exhaustResonators: BandpassFilter[] = [];
   private exhaustResonatorGains: number[] = [];
   private readonly intakeFilter: OnePoleLowpass;
+  private readonly intakeSecondFilter: OnePoleLowpass;
   private readonly pulseBrightnessFilter: OnePoleLowpass;
+  private readonly airflowFilter: OnePoleLowpass;
+  private noiseAmount = 1;
   private readonly dcBlocker = new DcBlocker();
   private readonly noiseGenerator = new NoiseGenerator(NOISE_SEED);
   private blockPeakBeforeSaturation = 0;
@@ -49,7 +55,9 @@ export class EngineSynth {
     this.sampleRate = sampleRate;
     this.exhaustPipe = new DampedCombFilter(sampleRate, 1, 0, SPEED_OF_SOUND_METERS_PER_SECOND);
     this.intakeFilter = new OnePoleLowpass(sampleRate, INTAKE_CUTOFF_HZ);
+    this.intakeSecondFilter = new OnePoleLowpass(sampleRate, INTAKE_CUTOFF_HZ);
     this.pulseBrightnessFilter = new OnePoleLowpass(sampleRate, this.profile.pulseBrightnessHz);
+    this.airflowFilter = new OnePoleLowpass(sampleRate, AIRFLOW_SMOOTHING_HZ);
   }
 
   /**
@@ -57,10 +65,19 @@ export class EngineSynth {
    * @param settings réglages moteur du projet
    */
   configure(settings: EngineSettings): void {
-    const profile = getVehicleProfile(settings.profileId);
+    this.configureWithProfile(getVehicleProfile(settings.profileId), settings);
+  }
+
+  /**
+   * Comme configure, mais avec un profil fourni directement (profil modifié pour les mesures, futur profil personnalisé).
+   * @param profile profil de véhicule
+   * @param settings réglages moteur du projet (cylindres, ordre d'allumage, volume)
+   */
+  configureWithProfile(profile: VehicleProfile, settings: EngineSettings): void {
     const cylinderCount = Math.max(1, Math.min(16, Math.round(settings.cylinderCount)));
     this.profile = profile;
     this.masterGain = settings.masterGain;
+    this.noiseAmount = Math.max(0, settings.noiseAmount ?? 1);
     this.firingSlots = buildFiringSlots(profile, cylinderCount, settings.firingOrder);
     this.cylinderEnvelopes = new Float32Array(cylinderCount);
     const gainPattern =
@@ -91,7 +108,9 @@ export class EngineSynth {
     this.exhaustPipe.reset();
     for (const resonator of this.exhaustResonators) resonator.reset();
     this.intakeFilter.reset();
+    this.intakeSecondFilter.reset();
     this.pulseBrightnessFilter.reset();
+    this.airflowFilter.reset();
     this.dcBlocker.reset();
     this.noiseGenerator.reset();
   }
@@ -118,10 +137,15 @@ export class EngineSynth {
       const pulseSum = this.decayCylinderEnvelopes();
       const noiseSample = this.noiseGenerator.nextSample();
 
-      const combustionSample = pulseSum * (1 + profile.combustionNoiseAmount * (0.5 + load) * noiseSample);
+      // Le bruit de combustion suit le carré de l'enveloppe : il reste concentré sur l'attaque de chaque explosion
+      // au lieu de devenir un souffle continu quand les impulsions se chevauchent à haut régime.
+      const combustionNoise = this.noiseAmount * profile.combustionNoiseAmount * (0.5 + load) * noiseSample * pulseSum * pulseSum;
+      const combustionSample = pulseSum + combustionNoise;
       const exhaustSample = this.processExhaust(this.pulseBrightnessFilter.process(combustionSample));
+      // Admission : souffle sourd (filtré deux fois) proportionnel au débit d'air (impulsions lissées), donc nul moteur coupé.
+      const airflow = this.airflowFilter.process(pulseSum) * AIRFLOW_GAIN;
       const intakeSample =
-        this.intakeFilter.process(noiseSample) * (0.2 + pulseSum) * profile.intakeNoiseAmount * (0.3 + load);
+        this.intakeSecondFilter.process(this.intakeFilter.process(noiseSample)) * airflow * this.noiseAmount * profile.intakeNoiseAmount * (0.3 + load);
       const mechanicalSample = this.computeMechanicalVibration(rpm);
 
       const drivenSample = this.dcBlocker.process(exhaustSample + intakeSample + mechanicalSample) * profile.outputGain;

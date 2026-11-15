@@ -14,6 +14,7 @@ Testé sur PC (navigateur intégré Chromium) : lecture / pause / reprise, ajout
 - `npm install` puis `npm run dev` (serveur de dev) ; `npm run build` (vérif TypeScript + build dans `dist/`) ; `npm run preview`.
 - `npm run check-render` : rend la démo pour chaque profil dans Node, affiche crête / RMS / vitesse et écrit `renders/*.wav` (ignoré par git) pour écoute.
 - `npm run check-levels` : niveau de chaque profil à régime constant (5 m), crête avant saturation et gain de sortie conseillé (cible 0,7 au pire cas).
+- `npm run check-noise` : part du souffle (combustion + admission) par rapport au moteur, au ralenti et au régime max, et niveau moteur coupé (doit être -inf).
 - `npm run make-icons` : régénère les icônes PNG.
 - Navigateur intégré : serveurs `vroumvroum-dev` (5195) et `vroumvroum-preview` (5196) dans `D:\CLAUDE\APP_NICO\.claude\launch.json`.
 
@@ -43,6 +44,7 @@ src/
 - **Charge moteur déduite de la pente du régime** en attendant une courbe d'accélérateur : accélération = pleine charge, décélération = frein moteur.
 - **Gain de sortie calibré par profil** (2026-11-15) : la saturation finale (tanh) n'est plus qu'un limiteur de sécurité ; chaque profil a un `outputGain` réglé avec `npm run check-levels` pour une crête ≤ 0,7 en pleine charge (sur-régime compris). Filtre de « brillance » sur les impulsions (moins de grésillement), limiteur de régime à 125 % du max du profil.
 - **Changer de profil remet la courbe de régime à l'échelle** (rapport des régimes max) : sinon une courbe de voiture jouée par un camion part à 6 500 tr/min.
+- **Souffle lié au moteur** (2026-11-15) : l'admission suit le débit d'air (impulsions lissées) au lieu d'avoir un plancher constant → silence moteur coupé ; le bruit de combustion suit le carré de l'enveloppe (concentré sur l'attaque) → plus de souffle continu à haut régime. Réglage « Souffle » 0–2 dans le panneau (`engine.noiseAmount`). Cible : souffle ≤ -14 dB sous le moteur au régime max.
 - **Export mono** pour l'instant (Doppler = source ponctuelle) ; stéréo / panoramique plus tard si besoin.
 - Imports avec extension `.ts` (`allowImportingTsExtensions`) : le même code tourne dans Vite et directement dans Node 24 (script de vérification).
 - PWA : service worker « réseau d'abord » → toujours la dernière version en ligne, cache seulement hors ligne.
@@ -68,5 +70,6 @@ Motos : monocylindre, bicylindre en V, 3 cylindres, 4 cylindres sportive. Voitur
 
 ## Journal
 - 2026-11-15 : dossier, docs, recherche initiale, proposition V0 → accord (dépôt public sans code, paysage d'abord).
+- 2026-11-15 : retour utilisateur « bruit de fond derrière le son » → cause : plancher constant du souffle d'admission (audible même moteur coupé, -47 dB) + bruit de combustion continu à haut régime ; corrigé, réglage « Souffle » ajouté, gains recalibrés.
 - 2026-11-15 : retour utilisateur « camion sature vers 3000 tr/min » → cause : niveau avant limiteur à 1,2 et courbe de voiture non remise à l'échelle ; corrigé (gain par profil, brillance, limiteur de régime, remise à l'échelle). 9 profils ajoutés (12 au total).
 - 2026-11-15 : V0 codée (DSP, AudioWorklet, export Worker, timeline RPM + distance, sauvegarde JSON, PWA), testée dans le navigateur intégré, publiée sur GitHub Pages.
