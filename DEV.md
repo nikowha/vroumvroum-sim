@@ -88,6 +88,7 @@ Motos : monocylindre, bicylindre en V, 3 cylindres, 4 cylindres sportive. Voitur
 - Aucun pour l'instant.
 
 ## Journal
+- 2026-11-15 : deux tests d'écoute ajoutés (`src/model/testProjects.ts`, boutons en haut du panneau) : « Passage » (comme la démo) et « Moteur proche » (5 m constants, vitesse 0, régime ralenti → coups de gaz → max). Régimes en fraction ralenti → max, donc adaptés à chaque profil ; profil et mixage conservés ; lecture lancée au clic.
 - 2026-11-15 : dossier, docs, recherche initiale, proposition V0 → accord (dépôt public sans code, paysage d'abord).
 - 2026-11-15 : retour « les pneus font du bruit de pluie » → cause : bruit blanc avec bande aiguë (42 % de l'énergie au-dessus de 2 kHz) ; refait en grondement grave/médium + ton de bande de roulement qui suit la vitesse + rythme des roues + texture de route, coupé au-dessus de 1,8 kHz (3 % au-dessus de 2 kHz). Niveau recalé.
 - 2026-11-15 : « son trop synthétique » → diagnostic (RESEARCH.md), puis les 5 étapes de réalisme faites, chacune avec case + curseur ; courbe Vitesse ajoutée ; niveaux recalibrés.

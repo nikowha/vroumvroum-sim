@@ -6,6 +6,7 @@ import type { WavSampleFormat } from './audio/wavEncoder.ts';
 import { exportProjectToWav } from './audio/wavExporter.ts';
 import { getVehicleProfile } from './dsp/vehicleProfiles.ts';
 import { createDefaultProject, parseProject, type Project } from './model/project.ts';
+import { createTestProject, type TestProjectId } from './model/testProjects.ts';
 import { createFileTimestamp, downloadBlob, pickTextFile } from './ui/fileTransfer.ts';
 import { EffectsPanel } from './ui/effectsPanel.ts';
 import { getRequiredElement, SettingsPanel } from './ui/settingsPanel.ts';
@@ -162,16 +163,34 @@ function saveProject(): void {
   downloadBlob(new Blob([projectJson], { type: 'application/json' }), `vroumvroum_${createFileTimestamp()}.json`);
 }
 
+/**
+ * Remplace le projet en cours, revient au début et met à jour tous les panneaux.
+ * @param newProject projet à afficher et à écouter
+ */
+function replaceProject(newProject: Project): void {
+  currentProject = newProject;
+  stopAndRewind();
+  settingsPanel.refreshFromProject();
+  effectsPanel.refreshFromProject();
+  realtimePlayer.setProject(currentProject);
+  timelineEditor.requestRender();
+}
+
+/**
+ * Charge un projet de test (même moteur, même mixage) et lance la lecture depuis le début.
+ * @param testProjectId test voulu
+ */
+function loadTestProject(testProjectId: TestProjectId): void {
+  const profile = getVehicleProfile(currentProject.engine.profileId);
+  replaceProject(createTestProject(testProjectId, currentProject, profile.idleRpm, profile.maxRpm));
+  void togglePlayback();
+}
+
 /** Ouvre un projet JSON. */
 async function loadProject(): Promise<void> {
   try {
     const projectText = await pickTextFile(projectFileInput);
-    currentProject = parseProject(JSON.parse(projectText));
-    stopAndRewind();
-    settingsPanel.refreshFromProject();
-    effectsPanel.refreshFromProject();
-    realtimePlayer.setProject(currentProject);
-    timelineEditor.requestRender();
+    replaceProject(parseProject(JSON.parse(projectText)));
   } catch (error) {
     console.error('loadProject', error);
     alert(`Projet illisible : ${String(error)}`);
@@ -183,6 +202,8 @@ getRequiredElement<HTMLButtonElement>('stopButton').addEventListener('click', st
 exportButton.addEventListener('click', () => void exportWav());
 getRequiredElement<HTMLButtonElement>('saveProjectButton').addEventListener('click', saveProject);
 getRequiredElement<HTMLButtonElement>('loadProjectButton').addEventListener('click', () => void loadProject());
+getRequiredElement<HTMLButtonElement>('passByTestButton').addEventListener('click', () => loadTestProject('passBy'));
+getRequiredElement<HTMLButtonElement>('closeEngineTestButton').addEventListener('click', () => loadTestProject('closeEngine'));
 window.addEventListener('keydown', (keyboardEvent) => {
   const isTyping = keyboardEvent.target instanceof HTMLInputElement || keyboardEvent.target instanceof HTMLSelectElement;
   if (keyboardEvent.code === 'Space' && !isTyping) {
